@@ -2,6 +2,8 @@ const { StatusCodes } = require("http-status-codes");
 const { User, Wallet, Transaction } = require("../models");
 const { getAuthorizationUrl, verifyTransaction } = require("../utils/paystack");
 const { handleResponse } = require("../helpers/response");
+const { BadRequestError } = require("../errors/index.js");
+const generateReference = require("../utils/generateReference.js");
 
 const fundWallet = async (req, res) => {
   const { email, amount } = req.body;
@@ -101,4 +103,84 @@ const verifyWalletTransaction = async (req, res) => {
   }
 };
 
-module.exports = { fundWallet, verifyWalletTransaction };
+const transferFund = async (req, res) => {
+  try {
+    const { username, amount, pin } = req.body;
+    const { id } = req.user;
+    const senderWallet = await Wallet.findOne({
+      where: { user_id: id },
+      include: User,
+    });
+    const { balance } = senderWallet.dataValues;
+    if (balance < amount) {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(
+          handleResponse(StatusCodes.BAD_REQUEST, false, "Insufficient funds")
+        );
+    } else {
+      const recipientWallet = await User.findOne({
+        where: { username: username },
+        include: {
+          model: Wallet,
+          as: "wallet",
+        },
+      });
+      if (recipientWallet == null) {
+        throw new BadRequestError("Recipient not found");
+      } else if (pin !== senderWallet.User.dataValues.pin) {
+        throw new BadRequestError("Incorrect pin");
+      } else {
+        const { user_id, balance: receiverBalance } =
+          recipientWallet.wallet.dataValues;
+        //sender
+        const senderBalance = balance - amount;
+        await Wallet.update(
+          { balance: Number(senderBalance), updateAt: Date.now() },
+          { where: { user_id: id } }
+        );
+        await Transaction.create({
+          reference: generateReference(false),
+          user_id: id,
+          wallet_id: senderWallet.dataValues.id,
+          status: "completed",
+          type: "debit",
+          amount: amount,
+          createdAt: Date.now(),
+        });
+
+        //receiver
+        const newReceiverBalance = Number(receiverBalance) + amount;
+        console.log(newReceiverBalance);
+        await Wallet.update(
+          { balance: Number(newReceiverBalance), updateAt: Date.now() },
+          { where: { user_id: user_id } }
+        );
+        await Transaction.create({
+          reference: generateReference(true),
+          user_id: user_id,
+          wallet_id: recipientWallet.dataValues.id,
+          status: "completed",
+          type: "credit",
+          amount: amount,
+          createdAt: Date.now(),
+        });
+        res
+          .status(StatusCodes.OK)
+          .json(handleResponse(StatusCodes.OK, true, "transaction completed"));
+      }
+    }
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        handleResponse(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          false,
+          `${error.message}`
+        )
+      );
+  }
+};
+
+module.exports = { fundWallet, verifyWalletTransaction, transferFund };
