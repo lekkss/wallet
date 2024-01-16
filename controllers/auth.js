@@ -5,7 +5,7 @@ const { handleResponse } = require("../helpers/response.js");
 const { StatusCodes } = require("http-status-codes");
 const generateToken = require("../utils/token.js");
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   const { email, username, password } = req.body;
   try {
     if (await User.findOne({ where: { username: username } })) {
@@ -50,19 +50,11 @@ const register = async (req, res) => {
       }
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        handleResponse(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          false,
-          `${error.message}`
-        )
-      );
+    next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const user = await User.scope("withPassword").findOne({
@@ -92,15 +84,7 @@ const login = async (req, res) => {
       }
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        handleResponse(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          false,
-          `${error.message}`
-        )
-      );
+    next(error);
   }
 };
 

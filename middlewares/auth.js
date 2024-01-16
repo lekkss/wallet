@@ -13,8 +13,6 @@ const auth =
     try {
       const decoded = Jwt.verify(token, process.env.JWT_SECRET);
       const { id, email, role } = decoded;
-      console.log("ROLE", role);
-      console.log(args.includes(role));
       if (args.includes(role)) {
         req.user = { id, email, role };
         next();

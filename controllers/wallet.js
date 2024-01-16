@@ -5,7 +5,7 @@ const { handleResponse } = require("../helpers/response");
 const { BadRequestError } = require("../errors/index.js");
 const generateReference = require("../utils/generateReference.js");
 
-const fundWallet = async (req, res) => {
+const fundWallet = async (req, res, next) => {
   const { email, amount } = req.body;
   try {
     const user = await User.findOne({ where: { email: email } });
@@ -25,19 +25,11 @@ const fundWallet = async (req, res) => {
         .json(handleResponse(StatusCodes.BAD_REQUEST, false, "User Not found"));
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        handleResponse(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          false,
-          `${error.message}`
-        )
-      );
+    next(error);
   }
 };
 
-const verifyWalletTransaction = async (req, res) => {
+const verifyWalletTransaction = async (req, res, next) => {
   const { reference } = req.body;
   try {
     const wallet = await Wallet.findOne({ where: { user_id: req.user.id } });
@@ -91,19 +83,11 @@ const verifyWalletTransaction = async (req, res) => {
         .json(handleResponse(StatusCodes.BAD_REQUEST, false, "User Not found"));
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        handleResponse(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          false,
-          `${error.message}`
-        )
-      );
+    next(error);
   }
 };
 
-const transferFund = async (req, res) => {
+const transferFund = async (req, res, next) => {
   try {
     const { username, amount, pin } = req.body;
     const { id } = req.user;
@@ -171,16 +155,41 @@ const transferFund = async (req, res) => {
       }
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        handleResponse(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          false,
-          `${error.message}`
-        )
-      );
+    next(error);
   }
 };
 
-module.exports = { fundWallet, verifyWalletTransaction, transferFund };
+const getTransactions = async (req, res, next) => {
+  try {
+    const transactions = await Transaction.findAll({
+      where: { user_id: req.user.id },
+    });
+    if (transactions) {
+      res
+        .status(StatusCodes.OK)
+        .json(
+          handleResponse(
+            StatusCodes.OK,
+            true,
+            "Transactions Fetched successfully",
+            transactions
+          )
+        );
+    } else {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(
+          handleResponse(StatusCodes.BAD_REQUEST, false, "User does not exist")
+        );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  fundWallet,
+  verifyWalletTransaction,
+  transferFund,
+  getTransactions,
+};
