@@ -14,7 +14,7 @@
 
 ## Introduction
 
-Bank Onboarding API is designed to streamline user onboarding processes. It simplifies user verification through phone numbers, initiates a KYC process, and automatically creates user profiles and bank accounts, enhancing the overall user experience.
+Using Paystack API to topup wallet, and send funds to other users, using username.
 
 ## Features
 
