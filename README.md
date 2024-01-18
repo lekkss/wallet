@@ -68,3 +68,4 @@ Ensure you have the following installed before setting up the project:
 | [POST] &nbsp; /api/v1/wallet/transactions | Get user transactions          | User       |
 
 ## Schema
+![test_bank drawio](https://github.com/lekkss/wallet/assets/54916682/cb293151-42cc-454a-894b-1a9069d5c97a)
