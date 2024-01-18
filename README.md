@@ -62,10 +62,11 @@ Ensure you have the following installed before setting up the project:
 | [POST] &nbsp; /api/v1/auth/register       | Create a new account           | none       |
 | [POST] &nbsp; /api/v1/auth/login          | User sign in                   | none       |
 | [POST] &nbsp; /api/v1/auth/logout         | Logout a user                  | User       |
-| [POST] &nbsp; /api/v1/wallet/get-link     | Get link for paystack topup    | User       |
+| [POST] &nbsp; /api/v1/wallet/topup        | Get link for paystack topup    | User       |
 | [POST] &nbsp; /api/v1/wallet/verify       | Verify payment after topup     | User       |
 | [POST] &nbsp; /api/v1/wallet/transfer     | Transfer funds to another user | User       |
 | [POST] &nbsp; /api/v1/wallet/transactions | Get user transactions          | User       |
 
 ## Schema
+
 ![test_bank drawio](https://github.com/lekkss/wallet/assets/54916682/cb293151-42cc-454a-894b-1a9069d5c97a)

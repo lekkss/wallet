@@ -69,7 +69,7 @@ const login = async (req, res, next) => {
       },
     });
     if (user == null) {
-      throw new BadRequestError("Invalid email");
+      throw new BadRequestError("Invalid User");
     } else if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new BadRequestError("Invalid password provided");
     } else {

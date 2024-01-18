@@ -7,7 +7,7 @@ const {
 } = require("../controllers/wallet");
 const router = express.Router();
 
-router.post("/get-link", fundWallet);
+router.post("/topup", fundWallet);
 router.post("/verify", verifyWalletTransaction);
 router.post("/transfer", transferFund);
 router.get("/transactions", getTransactions);
