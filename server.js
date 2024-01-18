@@ -9,6 +9,7 @@ const app = express();
 const auth = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
 const walletRouter = require("./routes/wallet");
+const userRouter = require("./routes/user");
 const db = require("./models/index");
 // const { redisConnect } = require("./services/redis");
 // redisConnect();
@@ -25,6 +26,7 @@ app.use(express.json());
 //
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/wallet", auth("user"), walletRouter);
+app.use("/api/v1/user", auth("user"), userRouter);
 
 // initializing express middlewares
 app.use(notFound);

@@ -8,19 +8,22 @@ const generateToken = require("../utils/token.js");
 const register = async (req, res, next) => {
   const { email, username, password } = req.body;
   try {
+    //check if user exists
     if (await User.findOne({ where: { username: username } })) {
       throw new BadRequestError(`user with username: ${username} exists`);
     } else if (await User.findOne({ where: { email: email } })) {
       throw new BadRequestError(`user with email: ${email} exists`);
     } else {
+      //hash password
       let hashedPassword = await bcrypt.hash(password, 8);
-      //   const otp = await generateOtp();
+      //create user
       await User.create({
         ...req.body,
         role: "user",
         createdAt: new Date(),
         password: hashedPassword,
       });
+      //create user wallet
       const newUser = await User.findOne({ where: { email: email } });
       console.log(newUser);
       if (newUser) {

@@ -50,7 +50,7 @@ const verifyWalletTransaction = async (req, res, next) => {
         });
         if (transaction == null) {
           await Wallet.update(
-            { balance: Number(newBalance.toFixed(2)), updateAt: Date.now() },
+            { balance: Number(newBalance.toFixed(2)), updatedAt: Date.now() },
             { where: { user_id: req.user.id } }
           );
           await Transaction.create({
@@ -112,6 +112,8 @@ const transferFund = async (req, res, next) => {
       });
       if (recipientWallet == null) {
         throw new BadRequestError("Recipient not found");
+      } else if (senderWallet.User.dataValues.username == username) {
+        throw new BadRequestError("Cannot transfer to self");
       } else if (pin !== senderWallet.User.dataValues.pin) {
         throw new BadRequestError("Incorrect pin");
       } else {
@@ -120,7 +122,7 @@ const transferFund = async (req, res, next) => {
         //sender
         const senderBalance = balance - amount;
         await Wallet.update(
-          { balance: Number(senderBalance), updateAt: Date.now() },
+          { balance: Number(senderBalance), updatedAt: Date.now() },
           { where: { user_id: id } }
         );
         await Transaction.create({
@@ -137,7 +139,7 @@ const transferFund = async (req, res, next) => {
         const newReceiverBalance = Number(receiverBalance) + amount;
         console.log(newReceiverBalance);
         await Wallet.update(
-          { balance: Number(newReceiverBalance), updateAt: Date.now() },
+          { balance: Number(newReceiverBalance), updatedAt: Date.now() },
           { where: { user_id: user_id } }
         );
         await Transaction.create({

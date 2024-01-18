@@ -9,6 +9,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
+- [Postman Documentation](#postman-documentation)
 - [Schema](#schema)
 
 ## Introduction
@@ -66,6 +67,12 @@ Ensure you have the following installed before setting up the project:
 | [POST] &nbsp; /api/v1/wallet/verify       | Verify payment after topup     | User       |
 | [POST] &nbsp; /api/v1/wallet/transfer     | Transfer funds to another user | User       |
 | [POST] &nbsp; /api/v1/wallet/transactions | Get user transactions          | User       |
+| [POST] &nbsp; /api/v1/user/pin            | Create transfer pin            | User       |
+| [POST] &nbsp; /api/v1/user                | Get user account               | User       |
+
+## Postman Documentation
+
+https://documenter.getpostman.com/view/11912759/2s9YsRdV67
 
 ## Schema
 
